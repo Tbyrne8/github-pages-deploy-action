@@ -1,21 +1,18 @@
-name: Deploy Code to Release Branch 🚀
-on:
-  workflow_dispatch:
+deploy:
+  needs: build
+  runs-on: ubuntu-latest
+  timeout-minutes: 10
 
-jobs:
-  build:
-    name: Push to Release Branch
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7.0.0
+  permissions:
+    pages: write
+    id-token: write
 
-      # Workflow dispatch event that pushes the current version to the release branch.
-      # From here the secondary production deployment workflow will trigger to build the dependencies.
-      - name: Deploy 🚀
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          branch: releases/v4
-          folder: .
-          clean: false
-          single-commit: true
+  environment:
+    name: github-pages
+    url: ${{ steps.deployment.outputs.page_url }}
+
+  steps:
+    - id: deployment
+      uses: actions/deploy-pages@v4
+      with:
+        timeout: 600000
